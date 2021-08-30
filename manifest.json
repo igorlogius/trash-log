@@ -1,0 +1,24 @@
+{
+  "author": "igorlogius",
+  "background": {
+	"scripts": [
+		"idb-keyval.js",
+		"background.js"
+	]
+  },
+  "browser_action": {
+	"default_popup": "popup.html"
+  },
+  "description": "",
+  "icons": {
+  },
+  "manifest_version": 2,
+  "name": "trash-log",
+  "permissions": [
+	"tabs",
+        "notifications",
+	"downloads",
+	"bookmarks"
+  ],
+  "version": "1.0.0"
+}
