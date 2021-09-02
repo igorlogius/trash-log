@@ -32,7 +32,7 @@ browser.downloads.onCreated.addListener((item) => { dlstore[item.id] = item; });
 
 browser.tabs.onUpdated.addListener(
 	(tabId, changeInfo, tabInfo) => {
-	if(tabInfo.url) {
+	if(tabInfo.url && /^https?:/.test(tabInfo.url) ) {
 		tabstore[tabId] = tabInfo.url;
 		console.log(tabId, tabInfo.url);
 	}
