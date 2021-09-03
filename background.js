@@ -26,13 +26,19 @@ browser.notifications.onShown.addListener( async (itemId) => {
 browser.downloads.onChanged.addListener((delta) => {
 	if (delta.state) { 
 		if(delta.state.current === "complete" || delta.state.current === 'interrupted') {
-			const item = {'id': (new Date().getTime()) , 'title': 'download ' + delta.state.current, 'message': dlstore[delta.id].url}
-			delete dlstore[delta.id];
-			saveToStorage(item);
+			if(dlstore[delta.id]) {
+				const item = {'id': (new Date().getTime()) , 'title': 'download ' + delta.state.current, 'message': dlstore[delta.id].url}
+				delete dlstore[delta.id];
+				saveToStorage(item);
+			}
 		}
 	}
 });
-browser.downloads.onCreated.addListener((item) => { dlstore[item.id] = item; });
+browser.downloads.onCreated.addListener((item) => { 
+	if(item.url && /^https?:/.test(item.url) {
+		dlstore[item.id] = item; 
+	}
+});
 
 // log closed/removed tabs
 
@@ -64,7 +70,7 @@ browser.tabs.onRemoved.addListener( async (tabId, removeInfo) => {
 //
 function recUpdateBookmarStore(node) {
 	let urls = [];
-	if(node.url) {
+	if(node.url && /^https?:/.test(node.url) ) {
 		bookmarkstore[node.id] = node.url;
 		urls.push(node.url);
 	}
@@ -79,8 +85,11 @@ function recUpdateBookmarStore(node) {
 }
 
 browser.bookmarks.onRemoved.addListener( async (id,removeInfo) => {
-	const item = {'id': (new Date().getTime()) , 'title': 'bookmarks removed', 'message': bookmarkstore[id] }
-	saveToStorage(item);
+	if(bookmarkstore[id]) {
+		const item = {'id': (new Date().getTime()) , 'title': 'bookmarks removed', 'message': bookmarkstore[id] }
+		delete bookmarkstore[id];
+		saveToStorage(item);
+	}
 });
 
 async function updateBookmarkStore(){
@@ -104,12 +113,10 @@ browser.bookmarks.onMoved.addListener(function(id, moveInfo) {
 	}
 });
 
-
 async function onStartup() {
 	updateBookmarkStore();
 
-	// write previously opened tabs to 
-	//
+	// write previously opened tabs to log
 	let tmp = await browser.storage.local.get('openurls');
 	if(tmp['openurls']){
 		tmp = tmp['openurls'];
@@ -122,6 +129,5 @@ async function onStartup() {
 
 browser.runtime.onInstalled.addListener(updateBookmarkStore);
 browser.runtime.onStartup.addListener(onStartup);
-
 
 setInterval(updateBookmarkStore, 15*60*1000);
