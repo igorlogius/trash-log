@@ -3,6 +3,12 @@ const dlstore = {};
 const tabstore = {};
 const bookmarkstore = {};
 
+
+async function saveOpen(urls) {
+	console.log('saveOpen', urls);
+	await browser.storage.local.set({'openurls': urls});
+}
+
 async function saveToStorage(item) {
 	console.log('saveToStorage', item);
 	await idbKeyval.set(item.id, item);
@@ -31,20 +37,26 @@ browser.downloads.onCreated.addListener((item) => { dlstore[item.id] = item; });
 // log closed/removed tabs
 
 browser.tabs.onUpdated.addListener(
-	(tabId, changeInfo, tabInfo) => {
+	async (tabId, changeInfo, tabInfo) => {
 	if(tabInfo.url && /^https?:/.test(tabInfo.url) ) {
 		tabstore[tabId] = tabInfo.url;
 		console.log(tabId, tabInfo.url);
+
+		const open_urls = new Set((await browser.tabs.query({})).map( t => t.url ).filter( u => /^https?:/.test(u) ) );
+		saveOpen(open_urls);
 	}
 }, {properties: ["url"] });
 
 
-browser.tabs.onRemoved.addListener( (tabId, removeInfo) => {
+browser.tabs.onRemoved.addListener( async (tabId, removeInfo) => {
 	if(tabstore[tabId]) {
-		const item = {'id': (new Date().getTime()) , 'title': 'tabs closed', 'message': tabstore[tabId]}
+		const item = {'id': (new Date().getTime()) , 'title': 'tab closed', 'message': tabstore[tabId]}
 		delete tabstore[tabId];
 		saveToStorage(item);
 	}
+
+	const open_urls = new Set((await browser.tabs.query({})).map( t => t.url ).filter( u => /^https?:/.test(u) ) );
+	saveOpen(open_urls);
 });
 
 //
@@ -92,8 +104,24 @@ browser.bookmarks.onMoved.addListener(function(id, moveInfo) {
 	}
 });
 
+
+async function onStartup() {
+	updateBookmarkStore();
+
+	// write previously opened tabs to 
+	//
+	let tmp = await browser.storage.local.get('openurls');
+	if(tmp['openurls']){
+		tmp = tmp['openurls'];
+	}
+
+	const item = {'id': (new Date().getTime()) , 'title': 'tabs closed', 'message': [...tmp].join(" ") }
+	saveToStorage(item);
+
+}
+
 browser.runtime.onInstalled.addListener(updateBookmarkStore);
-browser.runtime.onStartup.addListener(updateBookmarkStore);
+browser.runtime.onStartup.addListener(onStartup);
 
 
 setInterval(updateBookmarkStore, 15*60*1000);
