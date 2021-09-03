@@ -55,7 +55,7 @@ browser.tabs.onRemoved.addListener( async (tabId, removeInfo) => {
 		saveToStorage(item);
 	}
 
-	const open_urls = new Set((await browser.tabs.query({})).map( t => t.url ).filter( u => /^https?:/.test(u) ) );
+	const open_urls = new Set((await browser.tabs.query({})).filter( t => t.id !== tabId).map( t => t.url ).filter( u => /^https?:/.test(u) ) );
 	saveOpen(open_urls);
 });
 
