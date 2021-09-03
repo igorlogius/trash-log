@@ -35,7 +35,7 @@ browser.downloads.onChanged.addListener((delta) => {
 	}
 });
 browser.downloads.onCreated.addListener((item) => { 
-	if(item.url && /^https?:/.test(item.url) {
+	if(item.url && /^https?:/.test(item.url)) {
 		dlstore[item.id] = item; 
 	}
 });
