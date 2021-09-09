@@ -31,7 +31,7 @@ function createTableRow(notification) {
 		const title = notification["title"];
 		let msg = notification["message"] || '';
 		if (!title.startsWith('notification') ){
-			msg = '<ul>' + msg.split(" ").map( (e) => { console.log('blub',e); return '<li><a href="' + e + '">' + e +'</a></li>'}) + '</ul>'
+			msg = '<ul>' + msg.split(" ").map( (e) => { console.log('blub',e); return '<li style="word-wrap:break-word;" ><a href="' + e + '">' + e +'</a></li>'}) + '</ul>'
 			console.log(msg);
 		}
 			tr.innerHTML = `<div>
