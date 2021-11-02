@@ -2,6 +2,7 @@
 const dlstore = {};
 const tabstore = {};
 const bookmarkstore = {};
+let idbKeyval = new TKVS('keyval-store','keyval');
 
 
 async function saveOpen(urls) {
@@ -24,7 +25,7 @@ browser.notifications.onShown.addListener( async (itemId) => {
 });
 
 browser.downloads.onChanged.addListener((delta) => {
-	if (delta.state) { 
+	if (delta.state) {
 		if(delta.state.current === "complete" || delta.state.current === 'interrupted') {
 			if(dlstore[delta.id]) {
 				const item = {'id': (new Date().getTime()) , 'title': 'download ' + delta.state.current, 'message': dlstore[delta.id].url}
@@ -34,9 +35,9 @@ browser.downloads.onChanged.addListener((delta) => {
 		}
 	}
 });
-browser.downloads.onCreated.addListener((item) => { 
+browser.downloads.onCreated.addListener((item) => {
 	if(item.url && /^https?:/.test(item.url)) {
-		dlstore[item.id] = item; 
+		dlstore[item.id] = item;
 	}
 });
 

@@ -1,3 +1,6 @@
+
+let idbKeyval = new TKVS('keyval-store','keyval');
+
 function deleteRow(rowTr) {
 	var mainTableBody = document.getElementById('mainTableBody');
 	mainTableBody.removeChild(rowTr);
@@ -17,7 +20,7 @@ function createTableRow(notification) {
 
 		//console.log(key, notification[key]);
 
-		
+
 		/*
 			var input = document.createElement('input');
 			input.className = key;
@@ -59,7 +62,7 @@ function collectConfig() {
 	// collect configuration from DOM
 	var mainTableBody = document.getElementById('mainTableBody');
 	var feeds = [];
-	for (var row = 0; row < mainTableBody.rows.length; row++) { 
+	for (var row = 0; row < mainTableBody.rows.length; row++) {
 		try {
 			var name = mainTableBody.rows[row].querySelector('.name').value.trim().toLowerCase();
 			try {
@@ -159,11 +162,11 @@ impbtnWrp.addEventListener('click', function(evt) {
 impbtn.addEventListener('input', function (evt) {
 
 	console.log('impbtn');
-	
+
 	var file  = this.files[0];
 
 	//console.log(file.name);
-	
+
 	var reader = new FileReader();
 	        reader.onload = async function(e) {
             try {
